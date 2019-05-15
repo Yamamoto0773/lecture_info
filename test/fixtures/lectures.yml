@@ -1,0 +1,21 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  canceled_at: 2019-05-15 12:16:15
+  supplemented_at: 2019-05-15 12:16:15
+  subject: MyString
+  class: 1
+  department: 1
+  room: MyString
+  teacher: MyString
+  remarks: MyText
+
+two:
+  canceled_at: 2019-05-15 12:16:15
+  supplemented_at: 2019-05-15 12:16:15
+  subject: MyString
+  class: 1
+  department: 1
+  room: MyString
+  teacher: MyString
+  remarks: MyText
