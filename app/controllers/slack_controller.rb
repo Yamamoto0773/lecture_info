@@ -1,5 +1,6 @@
 require 'open-uri'
 require 'nokogiri'
+require 'nkf'
 
 class SlackController < ApplicationController
   def send_helloworld
@@ -15,40 +16,32 @@ class SlackController < ApplicationController
     doc = Nokogiri::HTML(open(url))
 
     table_headers = ['休講日', '補講日', '科目名', '教室', '学科', '教員', '備考']
-
-    hash = {}
-    message = ''
+    table_keys = [:canceled_on, :supplemented_on, :subject_and_class, :room, :department, :staff, :remarks]
 
     doc.css('.cancel').each { |node|
       table = Nokogiri::HTML(node.to_xhtml)
-      cancel_at = []
-      supplemented_at = []
-      subject = ''
-      class_name = ''
 
-      table.css('td').each_with_index { |cell, i|
-        case i
-        when 0
-          cancel_at = str_to_date(cell.content)
-        when 1
-          supplemented_at = str_to_date(cell.content)
-        when 2
-          subject = cell.content.slice(0...cell.content.index('['))
-          class_name = substr_range(cell.content, '[', ']')
-        end
+      # 全角英数字を半角英数字，全角スペースを半角スペース，半角カナを全角カナに変換
+      # さらに先頭と末尾の空白を除去
+      table_values = table.css('td').map { |node| 
+        NKF.nkf('-wZ1X' ,node.content).strip
       }
-
+    
+      # 補講日と休講日が逆になっているテーブルが存在する
       unless table.at_css('th').content == table_headers[0]
-        tmp = cancel_at.dup
-        cancel_at = supplemented_at
-        supplemented_at = tmp
+        tmp = table_values[0].dup
+        table_values[0] = table_values[1]
+        table_values[1] = tmp
       end
 
-      p cancel_at
-      p supplemented_at
-      p subject
-      p class_name
+      table_hash = Hash[*[table_keys[0...table_values.size], table_values].transpose.flatten]
+      lecture = Lecture.new(table_hash)
+      lecture.save!
+
+      break
     }
+
+    message = ''
     
     # client = Slack::Web::Client.new
     # client.chat_postMessage(channel: '#develop', text: message, as_user: true)

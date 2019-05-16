@@ -1,9 +1,9 @@
 create_table :lectures, force: :cascade do |t|
-  t.date    :canceled_from
-  t.date    :canceled_to
-  t.date    :supplemented_from
-  t.date    :supplemented_to
-  t.string  :subject
+  t.datetime :canceled_from
+  t.datetime :canceled_to
+  t.datetime :supplemented_from
+  t.datetime :supplemented_to
+  t.string  :subject, null: false
   t.string  :class_name
   t.string  :room
   t.string  :staff
