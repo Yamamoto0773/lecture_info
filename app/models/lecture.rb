@@ -44,7 +44,6 @@ class Lecture < ApplicationRecord
         break
       end
     }
-    
   end
 
   def canceled_on=(str)
@@ -73,6 +72,18 @@ class Lecture < ApplicationRecord
     )
   end
 
+  # すでに同じ講座が登録されているか返します
+  def double_booking?
+    !double_booked.empty?
+  end
+
+  # 同じ講座を返します
+  def double_booked # -> array
+    lectures = Lecture
+      .where(class_name: self.class_name, canceled_from: self.canceled_from)
+      .where.not(id: self.id)
+  end
+
   private
 
   # YYYY月MM月DD日[n-m時限]を[YYYY月MM月DD日, n, m]に分割します
@@ -97,10 +108,6 @@ class Lecture < ApplicationRecord
   end
 
   def lecture_cannot_be_double_booking
-    lectures = Lecture
-      .where(class_name: self.class_name)
-      .where(canceled_from: self.canceled_from)
-
-    errors[:base] << '講座が重複しています' unless lectures.empty?
+    errors[:base] << '講座が重複しています' if double_booking?
   end
 end
