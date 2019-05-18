@@ -45,7 +45,7 @@ class Scraping::Lecture
       table_values[1] = split_date_str(table_values[1])
       subject, class_name = table_values[2].split(/[\[\]]/)
       table_values[2] = subject
-      table_values.insert(3, subject)
+      table_values.insert(3, class_name)
       table_values.delete_at(5)
 
       table_hash = {}
