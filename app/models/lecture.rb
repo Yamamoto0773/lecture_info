@@ -26,16 +26,8 @@ class Lecture < ApplicationRecord
 
   validate :lecture_cannot_be_double_booking
   
-  def department=(str)
-    # ダミーカラム
-    # 学科の欄からは正確な学科の情報が取得できないため，
-    # 科目名の欄のクラスから，推測します
-  end
-
-  def subject_and_class=(str)
-    index = str.index('[')
-    self.subject = str[0...index]
-    self.class_name = substr_range(str, '[', ']')
+  def class_name=(str)
+    super
 
     @department = :general
     DEPARTMENT_NAME.each { |key, val|
@@ -46,30 +38,19 @@ class Lecture < ApplicationRecord
     }
   end
 
-  def canceled_on=(str)
-    date_strings = perse_date_str(str)
-    @canceled_section_beg = date_strings[1].to_i
-    @canceled_section_end = date_strings[2].to_i
+  # [YYYY, MM, DD, 始まりのコマ, 終わりのコマ]から代入
+  def canceled_on=(strings)
+    @canceled_section_beg = strings[3].to_i
+    @canceled_section_end = strings[4].to_i
 
-    self.canceled_from = Time.zone.strptime(
-      date_strings[0] + LECTURE_SCHEDULE[@canceled_section_beg - 1][:from], '%Y年%m月%d日%H:%M:%S'
-    )
-    self.canceled_to = Time.zone.strptime(
-      date_strings[0] + LECTURE_SCHEDULE[@canceled_section_end - 1][:to], '%Y年%m月%d日%H:%M:%S'
-    )
+    self.canceled_from, self.canceled_to = date_strings_to_duration_time(strings)
   end
 
-  def supplemented_on=(str)
-    date_strings = perse_date_str(str)
-    @supplemented_section_beg = date_strings[1].to_i
-    @supplemented_section_end = date_strings[2].to_i
+  def supplemented_on=(strings)
+    @supplemented_section_beg = strings[1].to_i
+    @supplemented_section_end = strings[2].to_i
 
-    self.supplemented_from = Time.zone.strptime(
-      date_strings[0] + LECTURE_SCHEDULE[@supplemented_section_beg - 1][:from], '%Y年%m月%d日%H:%M:%S'
-    )
-    self.supplemented_to = Time.zone.strptime(
-      date_strings[0] + LECTURE_SCHEDULE[@supplemented_section_end - 1][:to], '%Y年%m月%d日%H:%M:%S'
-    )
+    self.supplemented_from, self.supplemented_to = date_strings_to_duration_time(strings)
   end
 
   # すでに同じ講座が登録されているか返します
@@ -86,28 +67,19 @@ class Lecture < ApplicationRecord
 
   private
 
-  # YYYY月MM月DD日[n-m時限]を[YYYY月MM月DD日, n, m]に分割します
-  def perse_date_str(str)
-    end_index = str.index('[')
-    date_str = str.slice(0...end_index)
-    section_str = substr_range(str, '[', ']')
-
-    end_index = section_str.index('-')
-    section_beg = section_str.slice(0...end_index)
-    beg_index = end_index + 1;
-    end_index = section_str.index('時')
-    section_end = section_str.slice(beg_index...end_index)
-
-    [date_str, section_beg, section_end]
-  end
-
-  def substr_range(str, beg_ch, end_ch)
-    beg_index = str.index(beg_ch) + 1
-    end_index = str.index(end_ch)
-    str.slice(beg_index...end_index)
-  end
-
   def lecture_cannot_be_double_booking
     errors[:base] << '講座が重複しています' if double_booking?
+  end
+
+  # [YYYY, MM, DD, 始まりのコマ, 終わりのコマ]から期間を表すdatetimeを生成
+  def date_strings_to_duration_time(date_strings) # -> array[from, to]
+    from = Time.zone.strptime(
+      date_strings[0..2].join + LECTURE_SCHEDULE[date_strings[3].to_i - 1][:from], '%Y%m%d%H:%M:%S'
+    )
+    to = Time.zone.strptime(
+      date_strings[0..2].join + LECTURE_SCHEDULE[date_strings[4].to_i - 1][:to], '%Y%m%d%H:%M:%S'
+    )
+
+    [from, to]
   end
 end
