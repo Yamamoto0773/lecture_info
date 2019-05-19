@@ -4,18 +4,20 @@ class LectureController < ApplicationController
     render plain: ret
   end
 
-  def new
-    render 'slack/new'
-  end
+  # def new
+  #   render 'slack/new'
+  # end
 
   def send_lecture_info
     before_time = Time.zone.now
-    
-    lecture = Scraping::Lecture.new(file_params)
-    lecture.scrape_from_file
+    url = 'http://www.nagano-nct.ac.jp/current/cancel_info_5th.php'
+    class_name = '5年J科'
 
-    created = Lecture.where(created_at: before_time..Time.zone.now)
-    updated = Lecture.where(updated_at: before_time..Time.zone.now)
+    lecture = Scraping::Lecture.new(url: url)
+    lecture.scrape_from_url
+
+    created = Lecture.where(class_name: class_name, created_at: before_time..Time.zone.now)
+    updated = Lecture.where(class_name: class_name, updated_at: before_time..Time.zone.now)
 
     # slackのメッセージレイアウトの都合上，1件ずつ送信
     created.each { |info| LectureMailer.new_info(info).deliver_now }
@@ -27,8 +29,8 @@ class LectureController < ApplicationController
 
   private
 
-  def file_params
-    params.permit(:file)
-  end
+  # def file_params
+  #   params.permit(:file)
+  # end
 
 end
