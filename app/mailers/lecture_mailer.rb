@@ -36,12 +36,12 @@ class LectureMailer < ApplicationMailer
     }
     field_arr << {
       title: '休講日',
-      value: "#{lecture.canceled_on} #{(lecture.canceled_section_beg + 1)/2}-#{(lecture.canceled_section_end + 1)/2}コマ目",
+      value: date_format(lecture.canceled_on, lecture.canceled_section_beg, lecture.canceled_section_end),
       short: true
     }
     field_arr << {
       title: '補講日',
-      value: "#{lecture.supplemented_on} #{(lecture.supplemented_section_beg + 1)/2}-#{(lecture.supplemented_section_end + 1)/2}コマ目",
+      value: date_format(lecture.supplemented_on, lecture.supplemented_section_beg, lecture.supplemented_section_end),
       short: true
     }
     if lecture.remarks.present?
@@ -51,5 +51,17 @@ class LectureMailer < ApplicationMailer
     hash.store('fields', field_arr)
 
     hash.to_json
+  end
+
+  def date_format(date, sec_beg, sec_end)
+    koma_beg = (sec_beg + 1)/2
+    koma_end = (sec_end + 1)/2
+
+    str = ""
+    str << I18n.l(date, format: :date)
+    str << ' '
+    str << "#{koma_beg}"
+    str << "〜#{koma_end}" if koma_beg != koma_end
+    str << 'コマ目'
   end
 end

@@ -1,0 +1,4 @@
+ja:
+  date:
+    formats:
+        date: "%Y年%m月%d日(%a)"
