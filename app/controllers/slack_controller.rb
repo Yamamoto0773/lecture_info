@@ -14,14 +14,14 @@ class SlackController < ApplicationController
     lecture = Scraping::Lecture.new(file_params)
     lecture.scrape_from_file
 
-    p created = Lecture.where(created_at: before_time..Time.zone.now)
-    p updated = Lecture.where(updated_at: before_time..Time.zone.now)
+    created = Lecture.where(created_at: before_time..Time.zone.now)
+    updated = Lecture.where(updated_at: before_time..Time.zone.now)
 
-    message = ''
+    # slackのメッセージレイアウトの都合上，1件ずつ送信
+    created.each { |info| LectureMailer.new_info(info).deliver_now }
+    updated.each { |info| LectureMailer.update_info(info).deliver_now }
     
-    # client = Slack::Web::Client.new
-    # client.chat_postMessage(channel: '#develop', text: message, as_user: true)
-
+    message = ''
     render plain: message
   end
 
