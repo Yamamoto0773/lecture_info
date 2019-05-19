@@ -23,33 +23,19 @@ class Lecture < ApplicationRecord
   attr_reader :canceled_section_end
   attr_reader :supplemented_section_beg
   attr_reader :supplemented_section_end
+  attr_reader :canceled_on
+  attr_reader :supplemented_on
 
   validate :lecture_cannot_be_double_booking
+
+  after_initialize :set_virtual_attributes
   
-  def class_name=(str)
-    super
-
-    @department = :general
-    DEPARTMENT_NAME.each { |key, val|
-      if self.class_name.include?(key.to_s) || self.class_name.include?(val)
-        @department = key
-        break
-      end
-    }
-  end
-
   # [YYYY, MM, DD, 始まりのコマ, 終わりのコマ]から代入
   def canceled_on=(strings)
-    @canceled_section_beg = strings[3].to_i
-    @canceled_section_end = strings[4].to_i
-
     self.canceled_from, self.canceled_to = date_strings_to_duration_time(strings)
   end
 
   def supplemented_on=(strings)
-    @supplemented_section_beg = strings[1].to_i
-    @supplemented_section_end = strings[2].to_i
-
     self.supplemented_from, self.supplemented_to = date_strings_to_duration_time(strings)
   end
 
@@ -71,7 +57,20 @@ class Lecture < ApplicationRecord
     errors[:base] << '講座が重複しています' if double_booking?
   end
 
-  # [YYYY, MM, DD, 始まりのコマ, 終わりのコマ]から期間を表すdatetimeを生成
+  def set_virtual_attributes
+    @department = :general
+    DEPARTMENT_NAME.each { |key, val|
+      if self.class_name.include?(key.to_s) || self.class_name.include?(val)
+        @department = key
+        break
+      end
+    }
+
+    @canceled_on, @canceled_section_beg, @canceled_section_end = duration_time_to_section(self.canceled_from, self.canceled_to)
+    @supplemented_on, @supplemented_section_beg, @supplemented_section_end = duration_time_to_section(self.supplemented_from, self.supplemented_to)
+  end
+
+  # [YYYY, MM, DD, 始まりの時限, 終わりの時限]から期間を表すdatetimeを生成
   def date_strings_to_duration_time(date_strings) # -> array[from, to]
     from = Time.zone.strptime(
       date_strings[0..2].join + LECTURE_SCHEDULE[date_strings[3].to_i - 1][:from], '%Y%m%d%H:%M:%S'
@@ -81,5 +80,25 @@ class Lecture < ApplicationRecord
     )
 
     [from, to]
+  end
+
+  # 2つのdatetimeから[date, 始まりの時限, 終わりの時限]を生成
+  def duration_time_to_section(from, to)
+    date = from.to_date
+    sec_beg = 0, sec_end = 0
+
+    LECTURE_SCHEDULE.each_with_index { |s, i|
+      if s[:from] == from.strftime('%H:%M:%S')
+        sec_beg = i and break
+      end
+    }
+
+    LECTURE_SCHEDULE.each_with_index { |s, i|
+      if s[:to] == to.strftime('%H:%M:%S')
+        sec_end = i and break
+      end
+    }
+
+    [date, sec_beg, sec_end]
   end
 end
