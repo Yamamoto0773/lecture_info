@@ -64,6 +64,6 @@ class Scraping::Lecture
 
   # YYYY月MM月DD日[n-m時限]を[YYYY, MM, DD, n, m]に分割します
   def split_date_str(str)
-    str.split(/\D/).select {|s| s.present? }
+    str.split(/\D+/)
   end
 end
