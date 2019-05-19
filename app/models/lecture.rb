@@ -89,13 +89,13 @@ class Lecture < ApplicationRecord
 
     LECTURE_SCHEDULE.each_with_index { |s, i|
       if s[:from] == from.strftime('%H:%M:%S')
-        sec_beg = i and break
+        sec_beg = i+1 and break
       end
     }
 
     LECTURE_SCHEDULE.each_with_index { |s, i|
       if s[:to] == to.strftime('%H:%M:%S')
-        sec_end = i and break
+        sec_end = i+1 and break
       end
     }
 
