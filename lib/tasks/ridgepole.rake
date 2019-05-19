@@ -1,0 +1,6 @@
+namespace :ridgepole do
+  desc 'schemaの内容をデータベースに反映させます'
+  task apply: :environment do
+    bundle exec "ridgepole -c config/database.for.heroku.ridgepole.yml -E production -f db/Schemafile --apply"
+  end
+end
