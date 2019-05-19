@@ -1,8 +1,8 @@
 Rails.application.routes.draw do
   # For details on the DSL available within this file, see http://guides.rubyonrails.org/routing.html
 
-  get 'slack/send_helloworld' => 'slack#send_helloworld'
-  get 'slack/new' => 'slack#new'
-  post 'slack/send_lecture_info' => 'slack#send_lecture_info'
+  get 'lecture/send_helloworld' => 'lecture#send_helloworld'
+  get 'lecture/new' => 'lecture#new'
+  post 'lecture/send_lecture_info' => 'lecture#send_lecture_info'
 
 end
