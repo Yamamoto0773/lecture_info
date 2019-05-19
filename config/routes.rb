@@ -4,5 +4,7 @@ Rails.application.routes.draw do
   # get 'lecture/send_helloworld' => 'lecture#send_helloworld'
   # get 'lecture/new' => 'lecture#new'
   get 'lecture/send_lecture_info' => 'lecture#send_lecture_info'
+  get 'lecture/index' => 'lecture#index'
 
+  root 'lecture#index'
 end

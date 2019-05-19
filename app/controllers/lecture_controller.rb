@@ -1,12 +1,16 @@
 class LectureController < ApplicationController
-  def send_helloworld
-    ret = LectureMailer.new_info.deliver_now
-    render plain: ret
-  end
+  # def send_helloworld
+  #   ret = LectureMailer.new_info.deliver_now
+  #   render plain: ret
+  # end
 
   # def new
   #   render 'slack/new'
   # end
+
+  def index
+    render plain: 'lecture_info'
+  end
 
   def send_lecture_info
     before_time = Time.zone.now
