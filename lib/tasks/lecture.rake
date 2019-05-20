@@ -19,4 +19,22 @@ namespace :lecture do
 
     puts "scraping completed! new_info:#{created.size}, updated_info:#{updated.size}"
   end
+
+  desc 'Opening url and send dummy lecture info to Slack (database is not affected)'
+  task test_scrape_and_send_dummy: :environment do
+    url = ENV['SCRAPE_URL']
+    class_name = ENV['TARGET_CLASS_NAME']
+
+    # test for opening url
+    lecture = Scraping::Lecture.new(url: url)
+    
+    created = Lecture.where(class_name: class_name).first
+    updated = Lecture.where(class_name: class_name).last
+
+    # slackのメッセージレイアウトの都合上，1件ずつ送信
+    LectureMailer.new_info(created).deliver_now
+    LectureMailer.update_info(updated).deliver_now
+
+    puts "test finished!"
+  end
 end
