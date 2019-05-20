@@ -4,7 +4,7 @@ require 'uri'
 
 class Slack::MessageDeliveryMethod < Slack::DeliveryMethodBase
   def deliver!(message)
-    attachments = [JSON.parse(mail.body.to_s)]
+    attachments = [JSON.parse(message.body.to_s)]
     channel = self.settings[:channel]
     
     client = Slack::Web::Client.new(token: self.settings[:api_token])
