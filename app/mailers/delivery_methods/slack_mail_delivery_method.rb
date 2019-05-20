@@ -15,6 +15,4 @@ class SlackMailDeliveryMethod
     client = Slack::Web::Client.new(token: self.settings[:api_token])
     client.chat_postMessage(channel: channel, attachments: attachments, as_user: true)
   end
-
-  private
 end

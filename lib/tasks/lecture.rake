@@ -1,5 +1,5 @@
 namespace :lecture do
-  desc 'Scrape the lecture information, then send these messages in Slack channel'
+  desc 'Scrape the lecture information, then send these messages to Slack channel'
   task scrape_and_send: :environment do
     before_time = Time.zone.now
     url = ENV['SCRAPE_URL']
