@@ -14,8 +14,8 @@ class LectureController < ApplicationController
 
   def send_lecture_info
     before_time = Time.zone.now
-    url = 'http://www.nagano-nct.ac.jp/current/cancel_info_5th.php'
-    class_name = '5年J科'
+    url = ENV['SCRAPE_URL']
+    class_name = ENV['TARGET_CLASS_NAME']
 
     lecture = Scraping::Lecture.new(url: url)
     lecture.scrape_from_url
