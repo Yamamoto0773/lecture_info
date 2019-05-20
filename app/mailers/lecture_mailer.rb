@@ -8,7 +8,8 @@ class LectureMailer < ApplicationMailer
       color: 'good',
       pretext: '新しい休講補講情報です',
     )
-    mail
+
+    mail delivery_method: slack_mailer
   end
 
   def update_info(lecture)
@@ -18,7 +19,8 @@ class LectureMailer < ApplicationMailer
       color: 'warning',
       pretext: '休講補講情報が更新されました',
     )
-    mail
+    
+    mail delivery_method: slack_mailer
   end
 
   private

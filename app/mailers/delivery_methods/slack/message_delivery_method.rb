@@ -1,14 +1,9 @@
+require 'delivery_methods/slack/delivery_method_base'
 require 'json'
 require 'uri'
 
-class SlackMailDeliveryMethod
-  attr_accessor :settings
-
-  def initialize(value)
-    self.settings = value
-  end
-
-  def deliver!(mail)
+class Slack::MessageDeliveryMethod < Slack::DeliveryMethodBase
+  def deliver!(message)
     attachments = [JSON.parse(mail.body.to_s)]
     channel = self.settings[:channel]
     
