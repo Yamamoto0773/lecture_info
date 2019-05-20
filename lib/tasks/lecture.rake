@@ -43,8 +43,8 @@ namespace :lecture do
     now = Time.zone.now
     class_name = ENV['TARGET_CLASS_NAME']
 
-    canceled = Lecture.where(class_name: class_name, canceled_from: now..now.since(2.days))
-    supplemented = Lecture.where(class_name: class_name, supplemented_from: now..now.since(2.days))
+    canceled = Lecture.where(class_name: class_name, canceled_from: now..now.since(1.days))
+    supplemented = Lecture.where(class_name: class_name, supplemented_from: now..now.since(1.days))
 
     canceled.each { |info| LectureMailer.canceled_reminder(info).deliver_now }
     supplemented.each { |info| LectureMailer.supplemented_reminder(info).deliver_now }
