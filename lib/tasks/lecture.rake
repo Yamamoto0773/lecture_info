@@ -37,4 +37,18 @@ namespace :lecture do
 
     puts "test finished!"
   end
+
+  desc 'Send reminder'
+  task send_reminders: :environment do
+    now = Time.zone.now
+    class_name = ENV['TARGET_CLASS_NAME']
+
+    canceled = Lecture.where(class_name: class_name, canceled_from: now..now.since(1.days))
+    supplemented = Lecture.where(class_name: class_name, supplemented_from: now..now.since(1.days))
+
+    canceled.each { |info| LectureMailer.canceled_reminder(info).deliver_now }
+    supplemented.each { |info| LectureMailer.supplemented_reminder(info).deliver_now }
+
+    puts "send reminders canceled_reminders:#{canceled.size} supplemented_reminders:#{supplemented.size}"
+  end
 end

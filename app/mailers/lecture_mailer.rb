@@ -1,6 +1,8 @@
 require 'json'
 
 class LectureMailer < ApplicationMailer
+  default delivery_method: :slack_message
+
   def new_info(lecture)
     @lecture_json = to_attachment_json(
       lecture,
@@ -8,6 +10,7 @@ class LectureMailer < ApplicationMailer
       color: 'good',
       pretext: '新しい休講補講情報です',
     )
+
     mail
   end
 
@@ -18,6 +21,34 @@ class LectureMailer < ApplicationMailer
       color: 'warning',
       pretext: '休講補講情報が更新されました',
     )
+
+    mail
+  end
+
+  def canceled_reminder(lecture)
+    message = "明日の#{lecture.subject}は休講です"
+
+    @lecture_json = {
+      text: message,
+    }.to_json
+
+    mail
+  end
+
+  def supplemented_reminder(lecture)
+    koma_beg = (lecture.supplemented_section_beg + 1)/2
+    koma_end = (lecture.supplemented_section_end + 1)/2
+
+    message = ""
+    message << "明日は#{lecture.subject}の補講が"
+    message << "#{koma_beg}"
+    message << "〜#{koma_end}" if koma_beg != koma_end
+    message << "コマ目にあります"
+
+    @lecture_json = {
+      text: message,
+    }.to_json
+
     mail
   end
 

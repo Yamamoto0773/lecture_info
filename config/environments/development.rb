@@ -35,7 +35,7 @@ Rails.application.configure do
 
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.delivery_method = :slack
+  config.action_mailer.delivery_method = :slack_message
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
