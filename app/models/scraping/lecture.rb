@@ -5,6 +5,17 @@ require 'nkf'
 class Scraping::Lecture
   include ActiveModel::Model
 
+  LECTURE_SCHEDULE = [
+    { from: '08:50:00', to: '09:34:59' }, # first
+    { from: '09:35:00', to: '10:19:59' }, # second
+    { from: '10:30:00', to: '11:14:59' }, # third
+    { from: '11:15:00', to: '11:59:59' }, # forth
+    { from: '12:50:00', to: '13:34:59' }, # fifth
+    { from: '13:35:00', to: '14:19:59' }, # sixth
+    { from: '14:30:00', to: '15:14:59' }, # seventh
+    { from: '15:15:00', to: '15:59:59' }, # eighth
+  ]
+
   attr_accessor :file, :url
 
   def scrape_from_file
@@ -39,10 +50,11 @@ class Scraping::Lecture
         table_values[1] = tmp
       end
 
+      table_values[0] = to_duration_time(split_date_str(table_values[0]))
+      table_values[1] = to_duration_time(split_date_str(table_values[1]))
+
       # 科目名とクラス名を分割し，別々の要素にする
       # 学科の要素を削除する
-      table_values[0] = split_date_str(table_values[0])
-      table_values[1] = split_date_str(table_values[1])
       subject, class_name = table_values[2].split(/[\[\]]/)
       table_values[2] = subject
       table_values.insert(3, class_name)
@@ -52,7 +64,7 @@ class Scraping::Lecture
       table_keys.zip(table_values).each { |key, val| table_hash.store(key, val) }
       
       lecture = ::Lecture.new(table_hash)
-      
+
       has_booked = lecture.double_booked
       if has_booked.empty?
         lecture.save
@@ -65,5 +77,28 @@ class Scraping::Lecture
   # YYYY月MM月DD日[n-m時限]を[YYYY, MM, DD, n, m]に分割します
   def split_date_str(str)
     str.split(/\D+/)
+  end
+
+  def to_ordinal(time)
+    LECTURE_SCHEDULE.each_with_index { |s, i|
+      if s[:to] == to.strftime('%H:%M:%S')
+        sec_end = i+1 and break
+      end
+    }
+  end
+
+  # [YYYY, MM, DD, 始まりの時限, 終わりの時限]から期間を表すdatetimeを生成
+  def to_duration_time(date_strings) # -> Range(from..to)
+    from = Time.zone.strptime(
+      date_strings[0..2].join + LECTURE_SCHEDULE[date_strings[3].to_i - 1][:from], '%Y%m%d%H:%M:%S'
+    )
+    to = Time.zone.strptime(
+      date_strings[0..2].join + LECTURE_SCHEDULE[date_strings[4].to_i - 1][:to], '%Y%m%d%H:%M:%S'
+    )
+    rescue
+      nil..nil
+    else
+
+    from..to
   end
 end
