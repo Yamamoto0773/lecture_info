@@ -22,6 +22,10 @@ class Lecture < ApplicationRecord
     self.canceled_from..self.canceled_to
   end
 
+  def canceled_on?
+    canceled_from?
+  end
+
   def supplemented_on=(time_range)
     self.supplemented_from = time_range.begin
     self.supplemented_to = time_range.end
@@ -29,6 +33,10 @@ class Lecture < ApplicationRecord
 
   def supplemented_on
     self.supplemented_from..self.supplemented_to
+  end
+  
+  def supplemented_on?
+    supplemented_from?
   end
 
   # すでに同じ講座が登録されているか返します
