@@ -1,0 +1,11 @@
+lecture:
+  time_table: [
+                { from: '08:50:00', to: '09:34:59' }, # first
+                { from: '09:35:00', to: '10:19:59' }, # second
+                { from: '10:30:00', to: '11:14:59' }, # third
+                { from: '11:15:00', to: '11:59:59' }, # forth
+                { from: '12:50:00', to: '13:34:59' }, # fifth
+                { from: '13:35:00', to: '14:19:59' }, # sixth
+                { from: '14:30:00', to: '15:14:59' }, # seventh
+                { from: '15:15:00', to: '15:59:59' }, # eighth
+              ]
