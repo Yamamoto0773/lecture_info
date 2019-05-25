@@ -1,6 +1,6 @@
 class ApplicationService
   attr_reader :status
-  attr_reader :result
+  attr_reader :error
 
   # -- Please override following methods ---
   def initialize; end
@@ -19,10 +19,11 @@ class ApplicationService
 
   def success
     @status = :success
+    error = nil
   end
 
   def failed(e)
     @status = :failed
-    @result = e
+    @error = e
   end
 end
