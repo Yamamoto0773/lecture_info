@@ -3,6 +3,7 @@ class ScrapeLecture::WithFileService < ScrapeLecture::BaseService
 
   def initialize(file)
     @file = file
+    super()
   end
 
   def execute!

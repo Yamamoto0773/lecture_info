@@ -4,10 +4,10 @@ require 'uri'
 
 class Slack::MessageDeliveryMethod < Slack::DeliveryMethodBase
   def deliver!(message)
-    attachments = [JSON.parse(message.body.to_s)]
-    channel = self.settings[:channel]
+    attachments = JSON.parse(message.body.to_s)
+    channel = message.channel || self.settings[:default_channel]
     
     client = Slack::Web::Client.new(token: self.settings[:api_token])
-    client.chat_postMessage(channel: channel, attachments: attachments, as_user: true)
+    client.chat_postMessage(channel: channel, attachments: [attachments], as_user: true)
   end
 end

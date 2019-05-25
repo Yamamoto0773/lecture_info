@@ -5,6 +5,7 @@ class ScrapeLecture::WithUrlService < ScrapeLecture::BaseService
 
   def initialize(url)
     @url = url
+    super()
   end
 
   def execute!

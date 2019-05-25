@@ -10,7 +10,7 @@ namespace :lecture do
 
     if service.failed?
       # [ToDo] handle error
-      raise "service failed! error:#{service.error.message}"
+      raise "service failed! error:#{service.error.message}\ntrace:\n#{service.error.backtrace}"
     end
 
     created = Lecture.where(class_name: class_name, created_at: before_time..Time.zone.now)

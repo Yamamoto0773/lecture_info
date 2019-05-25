@@ -4,5 +4,5 @@ ActionMailer::Base.add_delivery_method(:slack_message, Slack::MessageDeliveryMet
 
 ActionMailer::Base.slack_message_settings = {
   api_token: ENV['SLACK_API_TOKEN'],
-  channel: ENV['SLACK_DEFAULT_CHANNEL'],
+  default_channel: ENV['SLACK_DEFAULT_CHANNEL'],
 }

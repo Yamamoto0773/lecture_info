@@ -2,18 +2,9 @@ require 'nokogiri'
 require 'nkf'
 
 class ScrapeLecture::BaseService < ApplicationService
-  LECTURE_SCHEDULE = [
-    { from: '08:50:00', to: '09:34:59' }, # first
-    { from: '09:35:00', to: '10:19:59' }, # second
-    { from: '10:30:00', to: '11:14:59' }, # third
-    { from: '11:15:00', to: '11:59:59' }, # forth
-    { from: '12:50:00', to: '13:34:59' }, # fifth
-    { from: '13:35:00', to: '14:19:59' }, # sixth
-    { from: '14:30:00', to: '15:14:59' }, # seventh
-    { from: '15:15:00', to: '15:59:59' }, # eighth
-  ]
-
-  def initialize; end
+  def initialize
+    @time_table = Settings.lecture.time_table
+  end
 
   def scrape(doc)
     table_headers = ['休講日', '補講日', '科目名', '教室', '学科', '教員', '備考']
@@ -50,27 +41,18 @@ class ScrapeLecture::BaseService < ApplicationService
 
   private
 
-  def to_ordinal(time)
-    LECTURE_SCHEDULE.each_with_index { |s, i|
-      if s[:to] == to.strftime('%H:%M:%S')
-        sec_end = i+1 and break
-      end
-    }
-  end
-
   def to_duration_time(date_string) # -> Range(from..to)
     num_strings = date_string.split(/\D+/)
 
     from = Time.zone.strptime(
-      num_strings[0..2].join + LECTURE_SCHEDULE[num_strings[3].to_i - 1][:from], '%Y%m%d%H:%M:%S'
+      num_strings[0..2].join + @time_table[num_strings[3].to_i - 1][:from], '%Y%m%d%H:%M:%S'
     )
     to = Time.zone.strptime(
-      num_strings[0..2].join + LECTURE_SCHEDULE[num_strings[4].to_i - 1][:to], '%Y%m%d%H:%M:%S'
+      num_strings[0..2].join + @time_table[num_strings[4].to_i - 1][:to], '%Y%m%d%H:%M:%S'
     )
     rescue
       nil..nil
     else
-
     from..to
   end
 
