@@ -5,12 +5,16 @@ namespace :lecture do
     url = ENV['SCRAPE_URL']
     class_name = ENV['TARGET_CLASS_NAME']
 
-    lecture = Scraping::Lecture.new(url: url)
-    lecture.scrape_from_url
+    service = ScrapeLecture::WithUrlService.new(url)
+    service.execute!
+
+    if service.failed?
+      # [ToDo] handle error
+      raise "service failed! error:#{service.error.message}"
+    end
 
     created = Lecture.where(class_name: class_name, created_at: before_time..Time.zone.now)
     updated = Lecture.where(class_name: class_name, updated_at: before_time..Time.zone.now)
-
     updated = updated.reject { |i| i.created_at == i.updated_at }
 
     # slackのメッセージレイアウトの都合上，1件ずつ送信
@@ -25,17 +29,24 @@ namespace :lecture do
     url = ENV['SCRAPE_URL']
     class_name = ENV['TARGET_CLASS_NAME']
 
-    # test for opening url
-    lecture = Scraping::Lecture.new(url: url)
-    
-    created = Lecture.where(class_name: class_name).first
-    updated = Lecture.where(class_name: class_name).last
+    service = ScrapeLecture::WithUrlService.new(url)
 
-    # slackのメッセージレイアウトの都合上，1件ずつ送信
-    LectureMailer.new_info(created).deliver_now
-    LectureMailer.update_info(updated).deliver_now
+    begin
+      ActiveRecord::Base.transaction do
+        service.execute!
+        raise ActiveRecord::Rollback
+      end
+    rescue
+    else
+      created = Lecture.where(class_name: class_name).first
+      updated = Lecture.where(class_name: class_name).last
 
-    puts "test finished!"
+      # slackのメッセージレイアウトの都合上，1件ずつ送信
+      LectureMailer.new_info(created).deliver_now
+      LectureMailer.update_info(updated).deliver_now
+
+      puts "test finished!"
+    end
   end
 
   desc 'Send reminder'
