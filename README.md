@@ -1,24 +1,7 @@
-# README
+# lecure_info
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+## 概要
+学校の休講補講情報のページをスクレイピングし，その情報をSlackに送るWebアプリケーションです
 
-Things you may want to cover:
-
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+## ライセンス
+自由に使ってもらって結構です．著作権を放棄します．
