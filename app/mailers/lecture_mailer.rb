@@ -26,8 +26,13 @@ class LectureMailer < ApplicationMailer
   end
 
   def canceled_reminder(lecture)
-    message = "明日の#{lecture.subject}は休講です"
-    message << "\n(#{lecture.remarks})" if lecture.remarks.present?
+    cell = to_cell_range(lecture.canceled_on)
+
+    message = "明日の"
+    message << "#{cell.begin}"
+    message << "〜#{cell.end}" if cell.begin != cell.end
+    message << "コマ目の#{lecture.subject}は休講です"
+    message << "(#{lecture.remarks})" if lecture.remarks.present?
 
     @attachments_json = {
       text: message,
@@ -44,7 +49,7 @@ class LectureMailer < ApplicationMailer
     message << "#{cell.begin}"
     message << "〜#{cell.end}" if cell.begin != cell.end
     message << "コマ目にあります"
-    message << "\n(#{lecture.remarks})" if lecture.remarks.present?
+    message << "(#{lecture.remarks})" if lecture.remarks.present?
 
     @attachments_json = {
       text: message,
