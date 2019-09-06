@@ -1,4 +1,3 @@
-require 'nokogiri'
 require 'nkf'
 
 class ScrapeLecture::BaseService < ApplicationService
